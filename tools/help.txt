@@ -52,6 +52,29 @@ Options:
   --program      The program in the app to run (Advanced)
   --verbose      Print all output from builds logs.
 
+>>> debug
+Run the project, but suspend the server process for debugging.
+
+Usage: meteor debug [--debug-port <port>] [run options]
+       meteor run --debug-port <port> [run options]
+
+The server process will be suspended just before the first statement of
+server code that would normally execute. In order to continue execution of
+server code, you can use either the web-based Node Inspector by visiting
+the URL printed in the console (recommended), or the command-line
+debugger: `node debug localhost:5858` (replace 5858 with the custom
+`--debug-port`).
+
+The easiest way to set breakpoints is to use the `debugger` keyword:
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger
+
+The options for 'meteor debug' are identical to those for 'meteor run',
+with one addition:
+
+Options:
+  --debug-port   Port on which the server process debugger should listen
+                 for incoming connections from debugging clients, such as
+                 node-inspector (default 5858).
 
 >>> create
 Create a new project.
