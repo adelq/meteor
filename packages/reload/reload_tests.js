@@ -30,5 +30,13 @@ Tinytest.add("reload - migrate", function (test) {
     test.equal(data.data["reload test data 1"], { foo: "bar" });
     test.equal(data.data["reload test data 2"], { baz: "bar" });
     test.equal(data.reload, true);
+
+    // Test that you can specify an expiration time in Reload._onMigrate.
+    Reload._migrate(function () { }, { expirationSecs: 5 });
+    data = JSON.parse(Reload._getData());
+    test.equal(data.data["reload test data 1"], { foo: "bar" });
+    test.equal(data.data["reload test data 2"], { baz: "bar" });
+    test.equal(data.reload, true);
+    test.equal(data.expirationSecs, 5);
   });
 });

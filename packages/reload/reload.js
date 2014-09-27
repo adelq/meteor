@@ -98,8 +98,10 @@ try {
   Meteor._debug("Got invalid JSON on reload. Ignoring.");
 }
 
+var expirationTime = old_parsed.time +
+      (old_parsed.expirationSecs * 1000 || TIMEOUT);
 if (old_parsed.reload && typeof old_parsed.data === "object" &&
-    old_parsed.time + TIMEOUT > (new Date()).getTime()) {
+    expirationTime > (new Date()).getTime()) {
   // Meteor._debug("Restoring reload data.");
   old_data = old_parsed.data;
 }
@@ -146,7 +148,6 @@ Reload._migrationData = function (name) {
 // Options are the same as for `Reload._migrate`.
 var pollProviders = function (tryReload, options) {
   tryReload = tryReload || function () {};
-  options = options || {};
 
   var migrationData = {};
   var remaining = _.clone(providers);
@@ -168,9 +169,13 @@ var pollProviders = function (tryReload, options) {
 // Options are:
 //  - immediateMigration: true if the page will be reloaded immediately
 //    regardless of whether packages report that they are ready or not.
+//  - expirationSecs: number of seconds after which the data should
+//    expire (i.e. be ignored if found in sessionStorage on page
+//    load). Defaults to TIMEOUT/1000.
 Reload._migrate = function (tryReload, options) {
   // Make sure each package is ready to go, and collect their
   // migration data
+  options = options || {};
   var migrationData = pollProviders(tryReload, options);
   if (migrationData === null)
     return false; // not ready yet..
@@ -178,7 +183,10 @@ Reload._migrate = function (tryReload, options) {
   try {
     // Persist the migration data
     var json = JSON.stringify({
-      time: (new Date()).getTime(), data: migrationData, reload: true
+      time: (new Date()).getTime(),
+      data: migrationData,
+      reload: true,
+      expirationSecs: options.expirationSecs
     });
   } catch (err) {
     Meteor._debug("Couldn't serialize data for migration", migrationData);
