@@ -63,7 +63,10 @@ OAuth.saveDataForRedirect = function (loginService, credentialToken) {
   Reload._onMigrate('oauth', function () {
     return [true, {loginService: loginService, credentialToken: credentialToken}];
   });
-  Reload._migrate(null, {immediateMigration: true});
+  Reload._migrate(null, {
+    immediateMigration: true,
+    expirationSecs: 15 * 60 // 15 minutes
+  });
 };
 
 // At the end of the redirect login flow, when we've redirected back
